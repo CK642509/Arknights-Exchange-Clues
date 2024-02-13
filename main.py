@@ -28,6 +28,26 @@ def create_player_want(s: str) -> list:
         counts[int(digit)-1] = 1
     return counts
 
+def print_temp_wants(players: list, tmp_wants: list):
+    nPlayers = len(players)
+
+    print("\n號碼\t", end='')
+    for j in range(1, NUM_CLUES + 1):
+        print(f"{j}\t", end='')
+    print("\n【需求狀況】")
+    print("--------------------------------------------------------------")
+    for i in range(nPlayers):
+        print(f"{players[i]}\t", end='')
+        for j in range(NUM_CLUES):
+            if tmp_wants[i][j] == 1:
+                print("O\t", end='')
+            elif tmp_wants[i][j] == 0:
+                print(".\t", end='')
+            else:
+                print(" \t", end='')
+        print("\n")
+    print("\n")
+
 
 if __name__ == '__main__':
     players = get_players()
@@ -112,7 +132,8 @@ if __name__ == '__main__':
     for i in range(nPlayers):
         temp_wants.append(all_wants[i].copy())
 
-            
+    # print want status
+    print_temp_wants(players, temp_wants)
 
 
 

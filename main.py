@@ -105,7 +105,7 @@ if __name__ == '__main__':
     print(nValid)
     print(valid_spot)
 
-            
+    # TODO: if nValid is too large, try to add more constraints to make it smaller
             
 
 

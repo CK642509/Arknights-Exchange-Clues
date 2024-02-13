@@ -106,6 +106,12 @@ if __name__ == '__main__':
     print(valid_spot)
 
     # TODO: if nValid is too large, try to add more constraints to make it smaller
+
+    # copy all_wants to all_wants_copy
+    all_wants_copy = []
+    for i in range(nPlayers):
+        all_wants_copy.append(all_wants[i].copy())
+
             
 
 

@@ -67,4 +67,46 @@ if __name__ == '__main__':
     print(all_stores)
     print(all_wants)
 
+    # check store and want
+    for i in range(nPlayers):
+        for j in range(NUM_CLUES):
+            # change want to 1 if store >= 3
+            if all_stores[i][j] >= 3:
+                all_wants[i][j] = 1
+
+            # change want to -1 if store is 0
+            if all_stores[i][j] == 0:
+                if all_wants[i][j] == 1:
+                    print(f"玩家{i+1}自己沒有線索{j+1}，不能跟別人換")   # 但也有可能是因為輸入 0 造成的
+                all_wants[i][j] = -1
+    
+    for i in range(NUM_CLUES):
+        total_players_with_clue = 0
+        for j in range(nPlayers):
+            if all_stores[j][i] > 0:
+                total_players_with_clue += 1
+        
+        if total_players_with_clue < 2:
+            print(f"線索{i+1}的玩家數量不足")
+            for j in range(nPlayers):
+                all_wants[j][i] = -1
+    print("===")
+    print(all_stores)
+    print(all_wants)
+
+    # count number of want = 0
+    nValid = 0
+    valid_spot = []
+    for i in range(nPlayers):
+        for j in range(NUM_CLUES):
+            if all_wants[i][j] == 0:
+                nValid += 1
+                valid_spot.append([i, j])
+    print(nValid)
+    print(valid_spot)
+
+            
+            
+
+
 

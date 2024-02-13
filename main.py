@@ -48,6 +48,27 @@ def print_temp_wants(players: list, tmp_wants: list):
         print("\n")
     print("\n")
 
+condition_count = 0
+def generate_conditions(index, valid_spot, temp_wants):
+    global condition_count
+    nValid = len(valid_spot)
+    x = 2 ** nValid
+    if index == nValid:
+        # We have generated a valid condition, print or store it
+        condition_count += 1
+        print(f"{condition_count} / {x}", end='\r')   # progress bar
+        if condition_count == 1000:
+            yield temp_wants.copy()   # return a copy of temp_wants
+    else:
+        # Set the current spot to 1 and generate the remaining conditions
+        i, j = valid_spot[index]
+        temp_wants[i][j] = 1
+        yield from generate_conditions(index + 1, valid_spot, temp_wants)
+
+        # Set the current spot to -1 and generate the remaining conditions
+        temp_wants[i][j] = -1
+        yield from generate_conditions(index + 1, valid_spot, temp_wants)
+
 
 if __name__ == '__main__':
     players = get_players()
@@ -133,7 +154,9 @@ if __name__ == '__main__':
         temp_wants.append(all_wants[i].copy())
 
     # print want status
-    print_temp_wants(players, temp_wants)
+    # print_temp_wants(players, temp_wants)
 
+    for condition in generate_conditions(0, valid_spot, temp_wants):
+        print_temp_wants(players, condition)
 
 

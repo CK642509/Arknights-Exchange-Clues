@@ -107,10 +107,10 @@ if __name__ == '__main__':
 
     # TODO: if nValid is too large, try to add more constraints to make it smaller
 
-    # copy all_wants to all_wants_copy
-    all_wants_copy = []
+    # copy all_wants to temp_wants
+    temp_wants = []
     for i in range(nPlayers):
-        all_wants_copy.append(all_wants[i].copy())
+        temp_wants.append(all_wants[i].copy())
 
             
 

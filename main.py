@@ -24,3 +24,19 @@ if __name__ == '__main__':
     num_conf = nPlayers * (nPlayers - 1)
     print(f"組合數 = {num_conf}")
 
+
+    # 建立組合矩陣
+    # conf[i][0] = 投票數
+    # conf[i][1] = 玩家1 (給)
+    # conf[i][2] = 玩家2 (收)
+    conf = [[0, 0, 0] for _ in range(num_conf)]
+    # print(conf)
+
+    count = 0
+    for i in range(nPlayers):
+        for j in range(nPlayers):
+            if i != j:
+                conf[count][1] = i
+                conf[count][2] = j
+                count += 1
+    # print(conf)

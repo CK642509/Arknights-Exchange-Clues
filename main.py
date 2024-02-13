@@ -21,6 +21,9 @@ def create_player_store(s: str) -> list:
 
 def create_player_want(s: str) -> list:
     counts = [0] * NUM_CLUES
+    if s == "0":
+        return counts
+
     for digit in s:
         counts[int(digit)-1] = 1
     return counts

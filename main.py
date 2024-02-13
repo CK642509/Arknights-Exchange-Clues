@@ -10,7 +10,18 @@ def get_input_clues() -> list:
         data = f.readlines()
         clues = [x.strip() for x in data]
         return clues
-    
+
+def create_player_store(s: str) -> list:
+    counts = [0] * 7
+    for digit in s:
+        counts[int(digit)-1] += 1
+    return counts
+
+def create_player_want(s: str) -> list:
+    counts = [0] * 7
+    for digit in s:
+        counts[int(digit)-1] = 1
+    return counts
 
 
 if __name__ == '__main__':
@@ -40,3 +51,15 @@ if __name__ == '__main__':
                 conf[count][2] = j
                 count += 1
     # print(conf)
+
+    all_stores = []
+    all_wants = []
+    for clue in clues:
+        store = clue.split(" ")[0]
+        want = clue.split(" ")[1]
+        all_stores.append(create_player_store(store))
+        all_wants.append(create_player_want(want))
+    print(all_stores)
+    print(all_wants)
+
+

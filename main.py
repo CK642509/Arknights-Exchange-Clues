@@ -1,3 +1,5 @@
+NUM_CLUES = 7
+
 # get player list
 def get_players() -> list:
     with open('players.txt', 'r') as f:
@@ -12,13 +14,13 @@ def get_input_clues() -> list:
         return clues
 
 def create_player_store(s: str) -> list:
-    counts = [0] * 7
+    counts = [0] * NUM_CLUES
     for digit in s:
         counts[int(digit)-1] += 1
     return counts
 
 def create_player_want(s: str) -> list:
-    counts = [0] * 7
+    counts = [0] * NUM_CLUES
     for digit in s:
         counts[int(digit)-1] = 1
     return counts

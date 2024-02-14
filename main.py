@@ -82,8 +82,7 @@ def generate_conditions(index, valid_spot, temp_wants):
         # We have generated a valid condition, print or store it
         condition_count += 1
         print(f"{condition_count} / {x}", end='\r')   # progress bar
-        if condition_count == 1000:
-            yield temp_wants.copy()   # return a copy of temp_wants
+        yield temp_wants.copy()   # return a copy of temp_wants
     else:
         # Set the current spot to 1 and generate the remaining conditions
         i, j = valid_spot[index]
@@ -94,7 +93,7 @@ def generate_conditions(index, valid_spot, temp_wants):
         temp_wants[i][j] = -1
         yield from generate_conditions(index + 1, valid_spot, temp_wants)
     
-def try_condition(condition: list, nPlayers: int, conf: list):
+def try_condition(condition: list, nPlayers: int, conf: list) -> list:
     """
     Evaluate the given condition. If it meets the criteria, return score and result, else return False.
     Criteria for a good condition:
@@ -118,8 +117,6 @@ def try_condition(condition: list, nPlayers: int, conf: list):
         # one player can only exchange with one other player
         if tmp_how[i][0] == 1:
             return False
-    print("tmp_how ==>")
-    print(tmp_how)
 
     
     tmp_rank = [0]*5
@@ -146,8 +143,6 @@ def try_condition(condition: list, nPlayers: int, conf: list):
         
         # TODO: 處理 $ 
 
-    print("tmp_rank ==>")
-    print(tmp_rank)
     num_conf = nPlayers * (nPlayers - 1)
     
 
@@ -216,15 +211,14 @@ def try_condition(condition: list, nPlayers: int, conf: list):
                 # # 玩家2 -> 玩家1
                 # elif conf[j][1] == tmp_how[i][2] and conf[j][2] == tmp_how[i][1]:
                 #     tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
-    print("tmp_vote ==>", tmp_vote)
-    print("tmp_chg ==>", tmp_chg)
-    print("tmp_num_chg ==>", tmp_num_chg)
 
     for i in range(3, nPlayers + 1):
         tmp_vote, tmp_chg, tmp_num_chg = nway_exchange(i, tmp_how, tmp_vote, tmp_chg, tmp_num_chg)
-        # print("tmp_vote ==>", tmp_vote)
-        # print("tmp_chg ==>", tmp_chg)
-        # print("tmp_num_chg ==>", tmp_num_chg)
+    
+    # 4. Minimize exchange combinations between players.
+    tmp_rank[3] = tmp_num_chg
+
+    return tmp_rank
 
 
 
@@ -323,9 +317,19 @@ if __name__ == '__main__':
     # print want status
     # print_temp_wants(players, temp_wants)
 
+    best_condition = None
+    best_rank = [nPlayers, 0, 0, 0, 0]
     for condition in generate_conditions(0, valid_spot, temp_wants):
-        print(condition)
-        print_temp_wants(players, condition)
-        try_condition(condition, nPlayers, conf)
-
+        # print(condition)
+        # print_temp_wants(players, condition)
+        tmp_rank = try_condition(condition, nPlayers, conf)
+        if tmp_rank:
+            for tmp_score, best_score in zip(tmp_rank, best_rank):
+                if tmp_rank < best_rank:
+                    best_rank = tmp_rank
+                    best_condition = condition
+                    break
+    
+    print("best_rank ==>", best_rank)
+    print("best_condition ==>", best_condition)
 

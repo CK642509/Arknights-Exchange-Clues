@@ -170,10 +170,35 @@ def try_condition(condition: list, nPlayers: int, conf: list):
         tmp_num_chg += 1
         tmp_chg.append([clue_no, p1, p2])
         return tmp_vote, tmp_chg, tmp_num_chg
-
+    
     tmp_vote = [0] * num_conf
     tmp_chg = []   # [[線索編號, 玩家1, 玩家2], ...]
     tmp_num_chg = 0
+    
+    def nway_exchange(nWay: int, tmp_how, tmp_vote, tmp_chg, tmp_num_chg):
+        for i in range(NUM_CLUES):
+            if tmp_how[i][0] == nWay:
+                solutions = get_derangement(nWay)
+                max_total = -1   # the best solution has the highest total
+                best_solution = None
+                for sol in solutions:
+                    total = 0
+                    for j in range(num_conf):
+                        for idx, target in enumerate(sol):
+                            if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
+                                total += tmp_vote[j]
+                    # update current best solution
+                    if total > max_total:
+                        max_total = total
+                        best_solution = sol
+
+                # update tmp_vote, tmp_chg, tmp_num_chg
+                for j in range(num_conf):
+                    for idx, target in enumerate(best_solution):
+                        if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
+                            tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
+        return tmp_vote, tmp_chg, tmp_num_chg
+
 
     # 2-way exchange
     for i in range(NUM_CLUES):
@@ -195,59 +220,12 @@ def try_condition(condition: list, nPlayers: int, conf: list):
     print("tmp_chg ==>", tmp_chg)
     print("tmp_num_chg ==>", tmp_num_chg)
 
-    # 3-way exchange
-    for i in range(NUM_CLUES):
-        if tmp_how[i][0] == 3:
-            # there are 2 possible solutions
-            # 1 -> 2，2 -> 3，3 -> 1
-            # 1 -> 3，2 -> 1，3 -> 2
-            comb3_solutions = get_derangement(3)
-            max_total = -1   # the best solution has the highest total
-            best_solution = None
-            for sol in comb3_solutions:
-                total = 0
-                for j in range(num_conf):
-                    for idx, target in enumerate(sol):
-                        if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
-                            total += tmp_vote[j]
-                # update current best solution
-                if total > max_total:
-                    max_total = total
-                    best_solution = sol
-
-            # update tmp_vote, tmp_chg, tmp_num_chg
-            for j in range(num_conf):
-                for idx, target in enumerate(best_solution):
-                    if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
-                        tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
-    
+    tmp_vote, tmp_chg, tmp_num_chg = nway_exchange(3, tmp_how, tmp_vote, tmp_chg, tmp_num_chg)
     print("tmp_vote ==>", tmp_vote)
     print("tmp_chg ==>", tmp_chg)
     print("tmp_num_chg ==>", tmp_num_chg)
 
-    # 4-way exchange
-    for i in range(NUM_CLUES):
-        if tmp_how[i][0] == 4:
-            max_total = -1   # the best solution has the highest total
-            best_solution = None
-            comb4_solutions = get_derangement(4)
-            for sol in comb4_solutions:
-                total = 0
-                for j in range(num_conf):
-                    for idx, target in enumerate(sol):
-                        if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
-                            total += tmp_vote[j]
-                # update current best solution
-                if total > max_total:
-                    max_total = total
-                    best_solution = sol
-
-            # update tmp_vote, tmp_chg, tmp_num_chg
-            for j in range(num_conf):
-                for idx, target in enumerate(best_solution):
-                    if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
-                        tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
-    
+    tmp_vote, tmp_chg, tmp_num_chg = nway_exchange(4, tmp_how, tmp_vote, tmp_chg, tmp_num_chg)
     print("tmp_vote ==>", tmp_vote)
     print("tmp_chg ==>", tmp_chg)
     print("tmp_num_chg ==>", tmp_num_chg)

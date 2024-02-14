@@ -1,3 +1,5 @@
+from utils.comb import comb3_solutions, comb4_solutions
+
 NUM_CLUES = 7
 
 # get player list
@@ -176,7 +178,7 @@ def try_condition(condition: list, nPlayers: int, conf: list):
             # there are 2 possible solutions
             # 1 -> 2，2 -> 3，3 -> 1
             # 1 -> 3，2 -> 1，3 -> 2
-            comb3_solutions = [[2, 3, 1], [3, 1, 2]]
+            # comb3_solutions = [[2, 3, 1], [3, 1, 2]]
             max_total = -1   # the best solution has the highest total
             best_solution = None
             for sol in comb3_solutions:
@@ -199,6 +201,33 @@ def try_condition(condition: list, nPlayers: int, conf: list):
     print("tmp_vote ==>", tmp_vote)
     print("tmp_chg ==>", tmp_chg)
     print("tmp_num_chg ==>", tmp_num_chg)
+
+    # 4-way exchange
+    for i in range(NUM_CLUES):
+        if tmp_how[i][0] == 4:
+            max_total = -1   # the best solution has the highest total
+            best_solution = None
+            for sol in comb4_solutions:
+                total = 0
+                for j in range(num_conf):
+                    for idx, target in enumerate(sol):
+                        if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
+                            total += tmp_vote[j]
+                # update current best solution
+                if total > max_total:
+                    max_total = total
+                    best_solution = sol
+
+            # update tmp_vote, tmp_chg, tmp_num_chg
+            for j in range(num_conf):
+                for idx, target in enumerate(best_solution):
+                    if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
+                        tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
+    
+    print("tmp_vote ==>", tmp_vote)
+    print("tmp_chg ==>", tmp_chg)
+    print("tmp_num_chg ==>", tmp_num_chg)
+
 
 
 

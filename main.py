@@ -9,6 +9,22 @@ DERANGE_6 = read_derangements(6)
 DERANGE_7 = read_derangements(7)
 DERANGE_8 = read_derangements(8)
 
+def get_derangement(n: int) -> list:
+    if n == 3:
+        return DERANGE_3
+    elif n == 4:
+        return DERANGE_4
+    elif n == 5:
+        return DERANGE_5
+    elif n == 6:
+        return DERANGE_6
+    elif n == 7:
+        return DERANGE_7
+    elif n == 8:
+        return DERANGE_8
+    else:
+        return []
+
 # get player list
 def get_players() -> list:
     with open('settings/players.txt', 'r') as f:
@@ -185,7 +201,7 @@ def try_condition(condition: list, nPlayers: int, conf: list):
             # there are 2 possible solutions
             # 1 -> 2，2 -> 3，3 -> 1
             # 1 -> 3，2 -> 1，3 -> 2
-            comb3_solutions = DERANGE_3
+            comb3_solutions = get_derangement(3)
             max_total = -1   # the best solution has the highest total
             best_solution = None
             for sol in comb3_solutions:
@@ -214,7 +230,7 @@ def try_condition(condition: list, nPlayers: int, conf: list):
         if tmp_how[i][0] == 4:
             max_total = -1   # the best solution has the highest total
             best_solution = None
-            comb4_solutions = DERANGE_4
+            comb4_solutions = get_derangement(4)
             for sol in comb4_solutions:
                 total = 0
                 for j in range(num_conf):

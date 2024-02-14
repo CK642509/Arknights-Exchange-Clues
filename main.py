@@ -184,11 +184,16 @@ def try_condition(condition: list, nPlayers: int, conf: list):
                 if total > max_total:
                     max_total = total
                     best_solution = sol
-            print("max_total ==>", max_total)
-            print("best_solution ==>", best_solution)
-            print("===")
+
+            # update tmp_vote, tmp_chg, tmp_num_chg
+            for j in range(num_conf):
+                for idx, target in enumerate(best_solution):
+                    if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
+                        tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
     
-    
+    print("tmp_vote ==>", tmp_vote)
+    print("tmp_chg ==>", tmp_chg)
+    print("tmp_num_chg ==>", tmp_num_chg)
 
 
 

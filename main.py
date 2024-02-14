@@ -1,6 +1,13 @@
-from utils.comb import comb3_solutions, comb4_solutions
+from derangement import read_derangements
 
 NUM_CLUES = 7
+
+DERANGE_3 = read_derangements(3)
+DERANGE_4 = read_derangements(4)
+DERANGE_5 = read_derangements(5)
+DERANGE_6 = read_derangements(6)
+DERANGE_7 = read_derangements(7)
+DERANGE_8 = read_derangements(8)
 
 # get player list
 def get_players() -> list:
@@ -178,7 +185,7 @@ def try_condition(condition: list, nPlayers: int, conf: list):
             # there are 2 possible solutions
             # 1 -> 2，2 -> 3，3 -> 1
             # 1 -> 3，2 -> 1，3 -> 2
-            # comb3_solutions = [[2, 3, 1], [3, 1, 2]]
+            comb3_solutions = DERANGE_3
             max_total = -1   # the best solution has the highest total
             best_solution = None
             for sol in comb3_solutions:
@@ -207,6 +214,7 @@ def try_condition(condition: list, nPlayers: int, conf: list):
         if tmp_how[i][0] == 4:
             max_total = -1   # the best solution has the highest total
             best_solution = None
+            comb4_solutions = DERANGE_4
             for sol in comb4_solutions:
                 total = 0
                 for j in range(num_conf):

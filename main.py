@@ -150,7 +150,7 @@ def try_condition(condition: list, nPlayers: int, conf: list):
     tmp_chg = []   # [[線索編號, 玩家1, 玩家2], ...]
     tmp_num_chg = 0
 
-    # 兩方交換
+    # 2-way exchange
     for i in range(NUM_CLUES):
         if tmp_how[i][0] == 2:
             for j in range(num_conf):
@@ -165,10 +165,10 @@ def try_condition(condition: list, nPlayers: int, conf: list):
     print("tmp_chg ==>", tmp_chg)
     print("tmp_num_chg ==>", tmp_num_chg)
 
-    # 三方交換
+    # 3-way exchange
     for i in range(NUM_CLUES):
         if tmp_how[i][0] == 3:
-            # 三方交換有兩種組合
+            # there are 2 possible solutions
             # 1 -> 2，2 -> 3，3 -> 1
             # 1 -> 3，2 -> 1，3 -> 2
             comb3_solutions = [[2, 3, 1], [3, 1, 2]]

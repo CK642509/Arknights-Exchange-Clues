@@ -4,13 +4,13 @@ NUM_CLUES = 7
 
 # get player list
 def get_players() -> list:
-    with open('players.txt', 'r') as f:
+    with open('settings/players.txt', 'r') as f:
         data = f.readlines()
         players = [x.strip() for x in data]
         return players
     
 def get_input_clues() -> list:
-    with open('clues.txt', 'r') as f:
+    with open('settings/clues.txt', 'r') as f:
         data = f.readlines()
         clues = [x.strip() for x in data]
         return clues

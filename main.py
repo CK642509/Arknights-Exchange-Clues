@@ -220,15 +220,12 @@ def try_condition(condition: list, nPlayers: int, conf: list):
     print("tmp_chg ==>", tmp_chg)
     print("tmp_num_chg ==>", tmp_num_chg)
 
-    tmp_vote, tmp_chg, tmp_num_chg = nway_exchange(3, tmp_how, tmp_vote, tmp_chg, tmp_num_chg)
-    print("tmp_vote ==>", tmp_vote)
-    print("tmp_chg ==>", tmp_chg)
-    print("tmp_num_chg ==>", tmp_num_chg)
+    for i in range(3, nPlayers + 1):
+        tmp_vote, tmp_chg, tmp_num_chg = nway_exchange(i, tmp_how, tmp_vote, tmp_chg, tmp_num_chg)
+        # print("tmp_vote ==>", tmp_vote)
+        # print("tmp_chg ==>", tmp_chg)
+        # print("tmp_num_chg ==>", tmp_num_chg)
 
-    tmp_vote, tmp_chg, tmp_num_chg = nway_exchange(4, tmp_how, tmp_vote, tmp_chg, tmp_num_chg)
-    print("tmp_vote ==>", tmp_vote)
-    print("tmp_chg ==>", tmp_chg)
-    print("tmp_num_chg ==>", tmp_num_chg)
 
 
 

@@ -68,6 +68,59 @@ def generate_conditions(index, valid_spot, temp_wants):
         # Set the current spot to -1 and generate the remaining conditions
         temp_wants[i][j] = -1
         yield from generate_conditions(index + 1, valid_spot, temp_wants)
+    
+def try_condition(condition: list, nPlayers: int):
+    """
+    Evaluate the given condition. If it meets the criteria, return score and result, else return False.
+    Criteria for a good condition:
+    1. Minimize players exchanging 0 clues.
+    2. Minimize players exchanging 1 clue.
+    3. Minimize players exchanging 6 clues.
+    4. Minimize exchange combinations between players.
+    5. Minimize total exchanges.
+    """
+
+    tmp_how = []
+    
+
+    for i in range(NUM_CLUES):
+        tmp_how.append([0])
+        for j in range(nPlayers):
+            if condition[j][i] == 1:
+                tmp_how[i][0] += 1
+                tmp_how[i].append(j)
+        
+        # one player can only exchange with one other player
+        if tmp_how[i][0] == 1:
+            return False
+    print(tmp_how)
+
+    
+    tmp_rank = [0]*5
+
+    # 5. Minimize total exchanges.
+    for i in range(NUM_CLUES):
+        tmp_rank[4] += tmp_how[i][0]
+
+    # 1. Minimize players exchanging 0 clues.
+    # 2. Minimize players exchanging 1 clue.
+    # 3. Minimize players exchanging 6 clues.
+    for i in range(nPlayers):
+        total_exchange_clues = 0
+        for j in range(NUM_CLUES):
+            if condition[i][j] == 1:
+                total_exchange_clues += 1
+
+        if total_exchange_clues == 0:
+            tmp_rank[0] += 1
+        elif total_exchange_clues == 1:
+            tmp_rank[1] += 1
+        elif total_exchange_clues == 6:
+            tmp_rank[2] += 1
+        
+        # TODO: 處理 $ 
+
+    print(tmp_rank)
 
 
 if __name__ == '__main__':
@@ -153,10 +206,14 @@ if __name__ == '__main__':
     for i in range(nPlayers):
         temp_wants.append(all_wants[i].copy())
 
+    # print(temp_wants)
+
     # print want status
     # print_temp_wants(players, temp_wants)
 
     for condition in generate_conditions(0, valid_spot, temp_wants):
+        print(condition)
         print_temp_wants(players, condition)
+        try_condition(condition, nPlayers)
 
 

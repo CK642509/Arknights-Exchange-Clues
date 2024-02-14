@@ -154,13 +154,18 @@ def try_condition(condition: list, nPlayers: int, conf: list):
     for i in range(NUM_CLUES):
         if tmp_how[i][0] == 2:
             for j in range(num_conf):
-                # tmp_how[i][1] 簡稱玩家1，tmp_how[i][2] 簡稱玩家2
-                # 玩家1 -> 玩家2
-                if conf[j][1] == tmp_how[i][1] and conf[j][2] == tmp_how[i][2]:
-                    tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
-                # 玩家2 -> 玩家1
-                elif conf[j][1] == tmp_how[i][2] and conf[j][2] == tmp_how[i][1]:
-                    tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
+                # there is only one possible solution
+                best_solution = [2, 1]
+                for idx, target in enumerate(best_solution):
+                    if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
+                        tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
+                # # tmp_how[i][1] 簡稱玩家1，tmp_how[i][2] 簡稱玩家2
+                # # 玩家1 -> 玩家2
+                # if conf[j][1] == tmp_how[i][1] and conf[j][2] == tmp_how[i][2]:
+                #     tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
+                # # 玩家2 -> 玩家1
+                # elif conf[j][1] == tmp_how[i][2] and conf[j][2] == tmp_how[i][1]:
+                #     tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
     print("tmp_vote ==>", tmp_vote)
     print("tmp_chg ==>", tmp_chg)
     print("tmp_num_chg ==>", tmp_num_chg)

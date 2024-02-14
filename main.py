@@ -69,7 +69,7 @@ def generate_conditions(index, valid_spot, temp_wants):
         temp_wants[i][j] = -1
         yield from generate_conditions(index + 1, valid_spot, temp_wants)
     
-def try_condition(condition: list, nPlayers: int):
+def try_condition(condition: list, nPlayers: int, conf: list):
     """
     Evaluate the given condition. If it meets the criteria, return score and result, else return False.
     Criteria for a good condition:
@@ -93,6 +93,7 @@ def try_condition(condition: list, nPlayers: int):
         # one player can only exchange with one other player
         if tmp_how[i][0] == 1:
             return False
+    print("tmp_how ==>")
     print(tmp_how)
 
     
@@ -120,7 +121,83 @@ def try_condition(condition: list, nPlayers: int):
         
         # TODO: 處理 $ 
 
+    print("tmp_rank ==>")
     print(tmp_rank)
+    num_conf = nPlayers * (nPlayers - 1)
+    
+
+    # # 建立組合矩陣
+    # # conf[i][0] = 投票數
+    # # conf[i][1] = 玩家1 (給)
+    # # conf[i][2] = 玩家2 (收)
+    # conf = [[0, 0, 0] for _ in range(num_conf)]
+
+    # count = 0
+    # for i in range(nPlayers):
+    #     for j in range(nPlayers):
+    #         if i != j:
+    #             conf[count][1] = i
+    #             conf[count][2] = j
+    #             count += 1
+    # print(conf)
+    def log(j: int, clue_no: int, p1: int, p2: int, tmp_vote: list, tmp_chg: list, tmp_num_chg: int):
+        tmp_vote[j] += 1
+        tmp_num_chg += 1
+        tmp_chg.append([clue_no, p1, p2])
+        return tmp_vote, tmp_chg, tmp_num_chg
+
+    tmp_vote = [0] * num_conf
+    tmp_chg = []
+    tmp_num_chg = 0
+
+    # 兩方交換
+    for i in range(NUM_CLUES):
+        if tmp_how[i][0] == 2:
+            for j in range(num_conf):
+                # tmp_how[i][1] 簡稱玩家1，tmp_how[i][2] 簡稱玩家2
+                # 玩家1 -> 玩家2
+                if conf[j][1] == tmp_how[i][1] and conf[j][2] == tmp_how[i][2]:
+                    tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
+                # 玩家2 -> 玩家1
+                elif conf[j][1] == tmp_how[i][2] and conf[j][2] == tmp_how[i][1]:
+                    tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
+    print("tmp_vote ==>", tmp_vote)
+    print("tmp_chg ==>", tmp_chg)
+    print("tmp_num_chg ==>", tmp_num_chg)
+
+    # 三方交換
+    for i in range(NUM_CLUES):
+        if tmp_how[i][0] == 3:
+            # 三方交換有兩種組合
+            # 1 -> 2，2 -> 3，3 -> 1
+            # 1 -> 3，3 -> 2，2 -> 1
+            tmp_3 = [0]*2
+            for j in range(num_conf):
+                # 玩家1 -> 玩家2
+                if conf[j][1] == tmp_how[i][1] and conf[j][2] == tmp_how[i][2]:
+                    tmp_3[0] += tmp_vote[j]
+                # 玩家2 -> 玩家3
+                elif conf[j][1] == tmp_how[i][2] and conf[j][2] == tmp_how[i][3]:
+                    tmp_3[0] += tmp_vote[j]
+                # 玩家3 -> 玩家1
+                elif conf[j][1] == tmp_how[i][3] and conf[j][2] == tmp_how[i][1]:
+                    tmp_3[0] += tmp_vote[j]
+
+
+            for j in range(num_conf):
+                # 玩家1 -> 玩家3
+                if conf[j][1] == tmp_how[i][1] and conf[j][2] == tmp_how[i][3]:
+                    tmp_3[1] += tmp_vote[j]
+                # 玩家3 -> 玩家2
+                elif conf[j][1] == tmp_how[i][3] and conf[j][2] == tmp_how[i][2]:
+                    tmp_3[1] += tmp_vote[j]
+                # 玩家2 -> 玩家1
+                elif conf[j][1] == tmp_how[i][2] and conf[j][2] == tmp_how[i][1]:
+                    tmp_3[1] += tmp_vote[j]
+
+
+
+
 
 
 if __name__ == '__main__':
@@ -214,6 +291,6 @@ if __name__ == '__main__':
     for condition in generate_conditions(0, valid_spot, temp_wants):
         print(condition)
         print_temp_wants(players, condition)
-        try_condition(condition, nPlayers)
+        try_condition(condition, nPlayers, conf)
 
 

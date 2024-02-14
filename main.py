@@ -170,30 +170,27 @@ def try_condition(condition: list, nPlayers: int, conf: list):
         if tmp_how[i][0] == 3:
             # 三方交換有兩種組合
             # 1 -> 2，2 -> 3，3 -> 1
-            # 1 -> 3，3 -> 2，2 -> 1
-            tmp_3 = [0]*2
-            for j in range(num_conf):
-                # 玩家1 -> 玩家2
-                if conf[j][1] == tmp_how[i][1] and conf[j][2] == tmp_how[i][2]:
-                    tmp_3[0] += tmp_vote[j]
-                # 玩家2 -> 玩家3
-                elif conf[j][1] == tmp_how[i][2] and conf[j][2] == tmp_how[i][3]:
-                    tmp_3[0] += tmp_vote[j]
-                # 玩家3 -> 玩家1
-                elif conf[j][1] == tmp_how[i][3] and conf[j][2] == tmp_how[i][1]:
-                    tmp_3[0] += tmp_vote[j]
+            # 1 -> 3，2 -> 1，3 -> 2
+            comb3_solutions = [[2, 3, 1], [3, 1, 2]]
+            max_total = -1   # the best solution has the highest total
+            best_solution = None
+            for sol in comb3_solutions:
+                total = 0
+                for j in range(num_conf):
+                    for idx, target in enumerate(sol):
+                        if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
+                            total += tmp_vote[j]
+                # update current best solution
+                if total > max_total:
+                    max_total = total
+                    best_solution = sol
+            print("max_total ==>", max_total)
+            print("best_solution ==>", best_solution)
+            print("===")
+    
+    
 
 
-            for j in range(num_conf):
-                # 玩家1 -> 玩家3
-                if conf[j][1] == tmp_how[i][1] and conf[j][2] == tmp_how[i][3]:
-                    tmp_3[1] += tmp_vote[j]
-                # 玩家3 -> 玩家2
-                elif conf[j][1] == tmp_how[i][3] and conf[j][2] == tmp_how[i][2]:
-                    tmp_3[1] += tmp_vote[j]
-                # 玩家2 -> 玩家1
-                elif conf[j][1] == tmp_how[i][2] and conf[j][2] == tmp_how[i][1]:
-                    tmp_3[1] += tmp_vote[j]
 
 
 

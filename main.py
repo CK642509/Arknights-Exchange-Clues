@@ -147,7 +147,7 @@ def try_condition(condition: list, nPlayers: int, conf: list):
         return tmp_vote, tmp_chg, tmp_num_chg
 
     tmp_vote = [0] * num_conf
-    tmp_chg = []
+    tmp_chg = []   # [[線索編號, 玩家1, 玩家2], ...]
     tmp_num_chg = 0
 
     # 兩方交換

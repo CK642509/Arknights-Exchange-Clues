@@ -217,6 +217,8 @@ def try_condition(condition: list, nPlayers: int, conf: list) -> list:
     
     # 4. Minimize exchange combinations between players.
     tmp_rank[3] = tmp_num_chg
+    
+    tmp_rank.append(tmp_chg)
 
     return tmp_rank
 
@@ -318,18 +320,21 @@ if __name__ == '__main__':
     # print_temp_wants(players, temp_wants)
 
     best_condition = None
+    best_chg = None
     best_rank = [nPlayers, 0, 0, 0, 0]
     for condition in generate_conditions(0, valid_spot, temp_wants):
         # print(condition)
         # print_temp_wants(players, condition)
         tmp_rank = try_condition(condition, nPlayers, conf)
         if tmp_rank:
-            for tmp_score, best_score in zip(tmp_rank, best_rank):
+            for tmp_score, best_score in zip(tmp_rank[:-1], best_rank):
                 if tmp_rank < best_rank:
                     best_rank = tmp_rank
                     best_condition = condition
+                    best_chg = tmp_rank[5]
                     break
     
     print("best_rank ==>", best_rank)
     print("best_condition ==>", best_condition)
+    print("best_chg ==>", best_chg)
 

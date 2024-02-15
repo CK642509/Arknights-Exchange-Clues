@@ -222,6 +222,21 @@ def try_condition(condition: list, nPlayers: int, conf: list) -> list:
 
     return tmp_rank
 
+def show_result(players: list, best_chg: list):
+    print("兌換方法：")
+    for i, player_1 in enumerate(players):
+        for j, player_2 in enumerate(players):
+            count = 0
+            for l in range(NUM_CLUES):
+                for change in best_chg:
+                    if change[1] == i and change[2] == j and change[0] == l:
+                        if count == 0:
+                            print(f"{player_1}\t →\t {player_2}\t", end='')
+                            count += 1
+                        print(f"{l+1}", end='')
+            if count != 0:
+                print()
+        print("--------------------------")
 
 
 
@@ -338,3 +353,7 @@ if __name__ == '__main__':
     print("best_condition ==>", best_condition)
     print("best_chg ==>", best_chg)
 
+    print_temp_wants(players, best_condition)
+
+    # show result
+    show_result(players, best_chg)

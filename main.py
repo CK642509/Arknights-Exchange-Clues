@@ -227,19 +227,16 @@ def show_result(players: list, best_chg: list):
     for i, player_1 in enumerate(players):
         for j, player_2 in enumerate(players):
             count = 0
-            for l in range(NUM_CLUES):
-                for change in best_chg:
-                    if change[1] == i and change[2] == j and change[0] == l:
+            for clue_no in range(NUM_CLUES):
+                for change in best_chg:   # change = [clue_no, player_1, player_2]
+                    if change[1] == i and change[2] == j and change[0] == clue_no:
                         if count == 0:
                             print(f"{player_1}\t →\t {player_2}\t", end='')
                             count += 1
-                        print(f"{l+1}", end='')
+                        print(f"{clue_no + 1}", end='')
             if count != 0:
                 print()
         print("--------------------------")
-
-
-
 
 
 
@@ -253,7 +250,7 @@ if __name__ == '__main__':
     print(clues)
     nPlayers = len(players)
 
-    # 計算組合數
+    # 計算完家之間的組合數
     num_conf = nPlayers * (nPlayers - 1)
     print(f"組合數 = {num_conf}")
 
@@ -263,7 +260,6 @@ if __name__ == '__main__':
     # conf[i][1] = 玩家1 (給)
     # conf[i][2] = 玩家2 (收)
     conf = [[0, 0, 0] for _ in range(num_conf)]
-    # print(conf)
 
     count = 0
     for i in range(nPlayers):

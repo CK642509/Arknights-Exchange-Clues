@@ -171,10 +171,10 @@ def try_condition(condition: list, nPlayers: int, conf: list) -> list:
     tmp_chg = []   # [[線索編號, 玩家1, 玩家2], ...]
     tmp_num_chg = 0
     
-    def nway_exchange(nWay: int, tmp_how, tmp_vote, tmp_chg, tmp_num_chg):
+    def n_way_exchange(n: int, tmp_how, tmp_vote, tmp_chg, tmp_num_chg):
         for i in range(NUM_CLUES):
-            if tmp_how[i][0] == nWay:
-                solutions = get_derangement(nWay)
+            if tmp_how[i][0] == n:
+                solutions = get_derangement(n)
                 max_total = -1   # the best solution has the highest total
                 best_solution = None
                 for sol in solutions:
@@ -214,7 +214,7 @@ def try_condition(condition: list, nPlayers: int, conf: list) -> list:
                 #     tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
 
     for i in range(3, nPlayers + 1):
-        tmp_vote, tmp_chg, tmp_num_chg = nway_exchange(i, tmp_how, tmp_vote, tmp_chg, tmp_num_chg)
+        tmp_vote, tmp_chg, tmp_num_chg = n_way_exchange(i, tmp_how, tmp_vote, tmp_chg, tmp_num_chg)
     
     # 4. Minimize exchange combinations between players.
     tmp_rank[3] = tmp_num_chg

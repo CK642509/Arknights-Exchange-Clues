@@ -96,7 +96,7 @@ def generate_conditions(index, valid_spot, temp_wants):
     
 def try_condition(condition: list, nPlayers: int, conf: list) -> list:
     """
-    Evaluate the given condition. If it meets the criteria, return score and result, else return False.
+    Evaluate the given condition. If it meets the criteria, return score and result, else return blank list.
     Criteria for a good condition:
     1. Minimize players exchanging 0 clues.
     2. Minimize players exchanging 1 clue.
@@ -117,7 +117,7 @@ def try_condition(condition: list, nPlayers: int, conf: list) -> list:
         
         # one player can only exchange with one other player
         if tmp_how[i][0] == 1:
-            return False
+            return []
 
     
     tmp_rank = [0]*5

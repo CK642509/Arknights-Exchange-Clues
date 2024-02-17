@@ -1,3 +1,4 @@
+import numpy as np
 from derangement import read_derangements
 
 NUM_CLUES = 7

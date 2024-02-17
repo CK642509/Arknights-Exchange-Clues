@@ -291,7 +291,7 @@ if __name__ == '__main__':
             # change want to -1 if store is 0
             if all_stores[i][j] == 0:
                 if all_wants[i][j] == 1:
-                    print(f"玩家{i+1}自己沒有線索{j+1}，不能跟別人換")   # 但也有可能是因為輸入 0 造成的
+                    print(f"玩家{i+1}自己沒有線索{j+1}，不能跟別人換")
                 all_wants[i][j] = -1
     
     for i in range(NUM_CLUES):

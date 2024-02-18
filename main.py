@@ -194,6 +194,11 @@ class ConditionEvaluator:
                 tmp_rank[1] += 1
             elif total_exchange_clues == 6:
                 tmp_rank[2] += 1
+        
+        # if tmp_rank 0 to 2 are worse than best_rank, return blank list
+        for tmp_score, best_score in zip(tmp_rank[:3], self.best_rank[:3]):
+            if tmp_score > best_score:
+                return []
     
         num_conf = self.nPlayers * (self.nPlayers - 1)
 

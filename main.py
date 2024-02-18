@@ -175,18 +175,26 @@ def try_condition(condition: list, nPlayers: int, conf: list) -> list:
         for i in range(NUM_CLUES):
             if tmp_how[i][0] == n:
                 solutions = get_derangement(n)
-                max_total = -1   # the best solution has the highest total
                 best_solution = None
-                for sol in solutions:
-                    total = 0
-                    for j in range(num_conf):
-                        for idx, target in enumerate(sol):
-                            if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
-                                total += tmp_vote[j]
-                    # update current best solution
-                    if total > max_total:
-                        max_total = total
-                        best_solution = sol
+                
+                # if tmp_vote is empty, then it's the first time to exchange
+                # just use the first solution
+                if tmp_vote == [0] * num_conf:
+                    best_solution = solutions[0]
+                else:
+                    # the best solution has the highest total
+                    max_total = -1
+                    
+                    for sol in solutions:
+                        total = 0
+                        for j in range(num_conf):
+                            for idx, target in enumerate(sol):
+                                if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
+                                    total += tmp_vote[j]
+                        # update current best solution
+                        if total > max_total:
+                            max_total = total
+                            best_solution = sol
 
                 # update tmp_vote, tmp_chg, tmp_num_chg
                 for j in range(num_conf):

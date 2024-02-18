@@ -95,6 +95,7 @@ class ConditionEvaluator:
         self.all_wants = all_wants
         self.nPlayers = len(all_wants)
         self.nClues = len(all_wants[0])
+        self.num_conf = self.nPlayers * (self.nPlayers - 1)   # 計算完家之間的組合數
         self.condition_count = 0
         self.best_condition = None
         self.best_chg = None
@@ -117,6 +118,20 @@ class ConditionEvaluator:
             temp_wants.append(all_wants[i].copy())
         self.temp_wants = temp_wants
 
+        # 建立組合矩陣
+        # conf[i][0] = 投票數
+        # conf[i][1] = 玩家1 (給)
+        # conf[i][2] = 玩家2 (收)
+        conf = [[0, 0, 0] for _ in range(self.num_conf)]
+        count = 0
+        for i in range(nPlayers):
+            for j in range(nPlayers):
+                if i != j:
+                    conf[count][1] = i
+                    conf[count][2] = j
+                    count += 1
+        self.conf = conf
+
     def generate_conditions(self, index: int):
         x = 2 ** self.nValid
         if index == self.nValid:
@@ -134,7 +149,7 @@ class ConditionEvaluator:
             self.temp_wants[i][j] = -1
             yield from self.generate_conditions(index + 1)
     
-    def try_condition(self, condition: list, conf: list) -> list:
+    def try_condition(self, condition: list, conf) -> list:
         """
         Evaluate the given condition. If it meets the criteria, return score and result, else return blank list.
         Criteria for a good condition:
@@ -253,7 +268,7 @@ class ConditionEvaluator:
     
     def evaluate(self):
         for condition in self.generate_conditions(0):
-            tmp_rank = self.try_condition(condition, conf)
+            tmp_rank = self.try_condition(condition, self.conf)
             if tmp_rank:
                 for tmp_score, best_score in zip(tmp_rank[:-1], self.best_rank):
                     if tmp_score < best_score:
@@ -273,26 +288,7 @@ if __name__ == '__main__':
     print(clues)
     nPlayers = len(players)
 
-    # 計算完家之間的組合數
-    num_conf = nPlayers * (nPlayers - 1)
-    print(f"組合數 = {num_conf}")
-
-
-    # 建立組合矩陣
-    # conf[i][0] = 投票數
-    # conf[i][1] = 玩家1 (給)
-    # conf[i][2] = 玩家2 (收)
-    conf = [[0, 0, 0] for _ in range(num_conf)]
-
-    count = 0
-    for i in range(nPlayers):
-        for j in range(nPlayers):
-            if i != j:
-                conf[count][1] = i
-                conf[count][2] = j
-                count += 1
-    # print(conf)
-
+    # create store and want
     all_stores = []
     all_wants = []
     for clue in clues:

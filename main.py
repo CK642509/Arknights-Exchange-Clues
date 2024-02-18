@@ -74,163 +74,6 @@ def print_temp_wants(players: list, tmp_wants: list):
         print("\n")
     print("\n")
 
-condition_count = 0
-def generate_conditions(index, valid_spot, temp_wants):
-    global condition_count
-    nValid = len(valid_spot)
-    x = 2 ** nValid
-    if index == nValid:
-        # We have generated a valid condition, print or store it
-        condition_count += 1
-        print(f"{condition_count} / {x}", end='\r')   # progress bar
-        yield temp_wants.copy()   # return a copy of temp_wants
-    else:
-        # Set the current spot to 1 and generate the remaining conditions
-        i, j = valid_spot[index]
-        temp_wants[i][j] = 1
-        yield from generate_conditions(index + 1, valid_spot, temp_wants)
-
-        # Set the current spot to -1 and generate the remaining conditions
-        temp_wants[i][j] = -1
-        yield from generate_conditions(index + 1, valid_spot, temp_wants)
-    
-def try_condition(condition: list, nPlayers: int, conf: list) -> list:
-    """
-    Evaluate the given condition. If it meets the criteria, return score and result, else return blank list.
-    Criteria for a good condition:
-    1. Minimize players exchanging 0 clues.
-    2. Minimize players exchanging 1 clue.
-    3. Minimize players exchanging 6 clues.
-    4. Minimize exchange combinations between players.
-    5. Minimize total exchanges.
-    """
-
-    tmp_how = []
-    
-
-    for i in range(NUM_CLUES):
-        tmp_how.append([0])
-        for j in range(nPlayers):
-            if condition[j][i] == 1:
-                tmp_how[i][0] += 1
-                tmp_how[i].append(j)
-        
-        # one player can only exchange with one other player
-        if tmp_how[i][0] == 1:
-            return []
-
-    
-    tmp_rank = [0]*5
-
-    # 5. Minimize total exchanges.
-    for i in range(NUM_CLUES):
-        tmp_rank[4] += tmp_how[i][0]
-
-    # 1. Minimize players exchanging 0 clues.
-    # 2. Minimize players exchanging 1 clue.
-    # 3. Minimize players exchanging 6 clues.
-    for i in range(nPlayers):
-        total_exchange_clues = 0
-        for j in range(NUM_CLUES):
-            if condition[i][j] == 1:
-                total_exchange_clues += 1
-
-        if total_exchange_clues == 0:
-            tmp_rank[0] += 1
-        elif total_exchange_clues == 1:
-            tmp_rank[1] += 1
-        elif total_exchange_clues == 6:
-            tmp_rank[2] += 1
-        
-        # TODO: 處理 $ 
-
-    num_conf = nPlayers * (nPlayers - 1)
-    
-
-    # # 建立組合矩陣
-    # # conf[i][0] = 投票數
-    # # conf[i][1] = 玩家1 (給)
-    # # conf[i][2] = 玩家2 (收)
-    # conf = [[0, 0, 0] for _ in range(num_conf)]
-
-    # count = 0
-    # for i in range(nPlayers):
-    #     for j in range(nPlayers):
-    #         if i != j:
-    #             conf[count][1] = i
-    #             conf[count][2] = j
-    #             count += 1
-    # print(conf)
-    def log(j: int, clue_no: int, p1: int, p2: int, tmp_vote: list, tmp_chg: list, tmp_num_chg: int):
-        tmp_vote[j] += 1
-        tmp_num_chg += 1
-        tmp_chg.append([clue_no, p1, p2])
-        return tmp_vote, tmp_chg, tmp_num_chg
-    
-    tmp_vote = [0] * num_conf
-    tmp_chg = []   # [[線索編號, 玩家1, 玩家2], ...]
-    tmp_num_chg = 0
-    
-    def n_way_exchange(n: int, tmp_how, tmp_vote, tmp_chg, tmp_num_chg):
-        for i in range(NUM_CLUES):
-            if tmp_how[i][0] == n:
-                solutions = get_derangement(n)
-                best_solution = None
-                
-                # if tmp_vote is empty, then it's the first time to exchange
-                # just use the first solution
-                if tmp_vote == [0] * num_conf:
-                    best_solution = solutions[0]
-                else:
-                    # the best solution has the highest total
-                    max_total = -1
-                    
-                    for sol in solutions:
-                        total = 0
-                        for j in range(num_conf):
-                            for idx, target in enumerate(sol):
-                                if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
-                                    total += tmp_vote[j]
-                        # update current best solution
-                        if total > max_total:
-                            max_total = total
-                            best_solution = sol
-
-                # update tmp_vote, tmp_chg, tmp_num_chg
-                for j in range(num_conf):
-                    for idx, target in enumerate(best_solution):
-                        if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
-                            tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
-        return tmp_vote, tmp_chg, tmp_num_chg
-
-
-    # 2-way exchange
-    for i in range(NUM_CLUES):
-        if tmp_how[i][0] == 2:
-            for j in range(num_conf):
-                # there is only one possible solution
-                best_solution = [2, 1]
-                for idx, target in enumerate(best_solution):
-                    if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
-                        tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
-                # # tmp_how[i][1] 簡稱玩家1，tmp_how[i][2] 簡稱玩家2
-                # # 玩家1 -> 玩家2
-                # if conf[j][1] == tmp_how[i][1] and conf[j][2] == tmp_how[i][2]:
-                #     tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
-                # # 玩家2 -> 玩家1
-                # elif conf[j][1] == tmp_how[i][2] and conf[j][2] == tmp_how[i][1]:
-                #     tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
-
-    for i in range(3, nPlayers + 1):
-        tmp_vote, tmp_chg, tmp_num_chg = n_way_exchange(i, tmp_how, tmp_vote, tmp_chg, tmp_num_chg)
-    
-    # 4. Minimize exchange combinations between players.
-    tmp_rank[3] = tmp_num_chg
-    
-    tmp_rank.append(tmp_chg)
-
-    return tmp_rank
-
 def show_result(players: list, best_chg: list):
     print("兌換方法：")
     for i, player_1 in enumerate(players):
@@ -247,7 +90,178 @@ def show_result(players: list, best_chg: list):
                 print()
         print("--------------------------")
 
+class ConditionEvaluator:
+    def __init__(self, all_wants: list):
+        self.all_wants = all_wants
+        self.nPlayers = len(all_wants)
+        self.nClues = len(all_wants[0])
+        self.condition_count = 0
+        self.best_condition = None
+        self.best_chg = None
+        self.best_rank = [self.nPlayers, 0, 0, 0, 0]
+        
+        # count number of want = 0
+        nValid = 0
+        valid_spot = []
+        for i in range(self.nPlayers):
+            for j in range(self.nClues):
+                if all_wants[i][j] == 0:
+                    nValid += 1
+                    valid_spot.append([i, j])
+        self.nValid = nValid
+        self.valid_spot = valid_spot
 
+        # copy all_wants to temp_wants
+        temp_wants = []
+        for i in range(nPlayers):
+            temp_wants.append(all_wants[i].copy())
+        self.temp_wants = temp_wants
+
+    def generate_conditions(self, index: int):
+        x = 2 ** self.nValid
+        if index == self.nValid:
+            # We have generated a valid condition, print or store it
+            self.condition_count += 1
+            print(f"{self.condition_count} / {x}", end='\r')   # progress bar
+            yield self.temp_wants.copy()   # return a copy of temp_wants
+        else:
+            # Set the current spot to 1 and generate the remaining conditions
+            i, j = self.valid_spot[index]
+            self.temp_wants[i][j] = 1
+            yield from self.generate_conditions(index + 1)
+
+            # Set the current spot to -1 and generate the remaining conditions
+            self.temp_wants[i][j] = -1
+            yield from self.generate_conditions(index + 1)
+    
+    def try_condition(self, condition: list, conf: list) -> list:
+        """
+        Evaluate the given condition. If it meets the criteria, return score and result, else return blank list.
+        Criteria for a good condition:
+        1. Minimize players exchanging 0 clues.
+        2. Minimize players exchanging 1 clue.
+        3. Minimize players exchanging 6 clues.
+        4. Minimize exchange combinations between players.
+        5. Minimize total exchanges.
+        """
+
+        tmp_how = []
+
+        for i in range(self.nClues):
+            tmp_how.append([0])
+            for j in range(self.nPlayers):
+                if condition[j][i] == 1:
+                    tmp_how[i][0] += 1
+                    tmp_how[i].append(j)
+            
+            # one player can only exchange with one other player
+            if tmp_how[i][0] == 1:
+                return []
+        
+        tmp_rank = [0]*5
+
+        # 5. Minimize total exchanges.
+        for i in range(self.nClues):
+            tmp_rank[4] += tmp_how[i][0]
+
+        # 1. Minimize players exchanging 0 clues.
+        # 2. Minimize players exchanging 1 clue.
+        # 3. Minimize players exchanging 6 clues.
+        for i in range(self.nPlayers):
+            total_exchange_clues = 0
+            for j in range(self.nClues):
+                if condition[i][j] == 1:
+                    total_exchange_clues += 1
+
+            if total_exchange_clues == 0:
+                tmp_rank[0] += 1
+            elif total_exchange_clues == 1:
+                tmp_rank[1] += 1
+            elif total_exchange_clues == 6:
+                tmp_rank[2] += 1
+    
+        num_conf = self.nPlayers * (self.nPlayers - 1)
+
+        def log(j: int, clue_no: int, p1: int, p2: int, tmp_vote: list, tmp_chg: list, tmp_num_chg: int):
+            tmp_vote[j] += 1
+            tmp_num_chg += 1
+            tmp_chg.append([clue_no, p1, p2])
+            return tmp_vote, tmp_chg, tmp_num_chg
+        
+        tmp_vote = [0] * num_conf
+        tmp_chg = []   # [[線索編號, 玩家1, 玩家2], ...]
+        tmp_num_chg = 0
+        
+        def n_way_exchange(n: int, tmp_how, tmp_vote, tmp_chg, tmp_num_chg):
+            for i in range(self.nClues):
+                if tmp_how[i][0] == n:
+                    solutions = get_derangement(n)
+                    best_solution = None
+                    
+                    # if tmp_vote is empty, then it's the first time to exchange
+                    # just use the first solution
+                    if tmp_vote == [0] * num_conf:
+                        best_solution = solutions[0]
+                    else:
+                        # the best solution has the highest total
+                        max_total = -1
+                        
+                        for sol in solutions:
+                            total = 0
+                            for j in range(num_conf):
+                                for idx, target in enumerate(sol):
+                                    if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
+                                        total += tmp_vote[j]
+                            # update current best solution
+                            if total > max_total:
+                                max_total = total
+                                best_solution = sol
+
+                    # update tmp_vote, tmp_chg, tmp_num_chg
+                    for j in range(num_conf):
+                        for idx, target in enumerate(best_solution):
+                            if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
+                                tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
+            return tmp_vote, tmp_chg, tmp_num_chg
+
+
+        # 2-way exchange
+        for i in range(self.nClues):
+            if tmp_how[i][0] == 2:
+                for j in range(num_conf):
+                    # there is only one possible solution
+                    best_solution = [2, 1]
+                    for idx, target in enumerate(best_solution):
+                        if conf[j][1] == tmp_how[i][idx + 1] and conf[j][2] == tmp_how[i][target]:
+                            tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
+                    # # tmp_how[i][1] 簡稱玩家1，tmp_how[i][2] 簡稱玩家2
+                    # # 玩家1 -> 玩家2
+                    # if conf[j][1] == tmp_how[i][1] and conf[j][2] == tmp_how[i][2]:
+                    #     tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
+                    # # 玩家2 -> 玩家1
+                    # elif conf[j][1] == tmp_how[i][2] and conf[j][2] == tmp_how[i][1]:
+                    #     tmp_vote, tmp_chg, tmp_num_chg = log(j, i, conf[j][1], conf[j][2], tmp_vote, tmp_chg, tmp_num_chg)
+
+        for i in range(3, self.nPlayers + 1):
+            tmp_vote, tmp_chg, tmp_num_chg = n_way_exchange(i, tmp_how, tmp_vote, tmp_chg, tmp_num_chg)
+        
+        # 4. Minimize exchange combinations between players.
+        tmp_rank[3] = tmp_num_chg
+        
+        tmp_rank.append(tmp_chg)
+        return tmp_rank
+    
+    def evaluate(self):
+        for condition in self.generate_conditions(0):
+            tmp_rank = self.try_condition(condition, conf)
+            if tmp_rank:
+                for tmp_score, best_score in zip(tmp_rank[:-1], self.best_rank):
+                    if tmp_score < best_score:
+                        self.best_rank = tmp_rank
+                        self.best_condition = condition
+                        self.best_chg = tmp_rank[5]
+                        break
+    
 
 
 
@@ -316,49 +330,13 @@ if __name__ == '__main__':
     print(all_stores)
     print(all_wants)
 
-    # count number of want = 0
-    nValid = 0
-    valid_spot = []
-    for i in range(nPlayers):
-        for j in range(NUM_CLUES):
-            if all_wants[i][j] == 0:
-                nValid += 1
-                valid_spot.append([i, j])
-    print(nValid)
-    print(valid_spot)
+    evaluator = ConditionEvaluator(all_wants)
+    evaluator.evaluate()
+    print("best_rank ==>", evaluator.best_rank)
+    print("best_condition ==>", evaluator.best_condition)
+    print("best_chg ==>", evaluator.best_chg)
 
-    # TODO: if nValid is too large, try to add more constraints to make it smaller
-
-    # copy all_wants to temp_wants
-    temp_wants = []
-    for i in range(nPlayers):
-        temp_wants.append(all_wants[i].copy())
-
-    # print(temp_wants)
-
-    # print want status
-    # print_temp_wants(players, temp_wants)
-
-    best_condition = None
-    best_chg = None
-    best_rank = [nPlayers, 0, 0, 0, 0]
-    for condition in generate_conditions(0, valid_spot, temp_wants):
-        # print(condition)
-        # print_temp_wants(players, condition)
-        tmp_rank = try_condition(condition, nPlayers, conf)
-        if tmp_rank:
-            for tmp_score, best_score in zip(tmp_rank[:-1], best_rank):
-                if tmp_rank < best_rank:
-                    best_rank = tmp_rank
-                    best_condition = condition
-                    best_chg = tmp_rank[5]
-                    break
-    
-    print("best_rank ==>", best_rank)
-    print("best_condition ==>", best_condition)
-    print("best_chg ==>", best_chg)
-
-    print_temp_wants(players, best_condition)
+    print_temp_wants(players, evaluator.best_condition)
 
     # show result
-    show_result(players, best_chg)
+    show_result(players, evaluator.best_chg)

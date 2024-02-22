@@ -91,7 +91,7 @@ def show_result(players: list, best_chg: list):
         print("--------------------------")
 
 class ConditionEvaluator:
-    def __init__(self, all_wants: list):
+    def __init__(self, all_wants: np.array):
         self.all_wants = all_wants
         self.nPlayers = len(all_wants)
         self.nClues = len(all_wants[0])
@@ -101,22 +101,27 @@ class ConditionEvaluator:
         self.best_chg = None
         self.best_rank = [self.nPlayers, 0, 0, 0, 0]
         
-        # count number of want = 0
-        nValid = 0
-        valid_spot = []
-        for i in range(self.nPlayers):
-            for j in range(self.nClues):
-                if all_wants[i][j] == 0:
-                    nValid += 1
-                    valid_spot.append([i, j])
-        self.nValid = nValid
-        self.valid_spot = valid_spot
+        # # count number of want = 0
+        # nValid = 0
+        # valid_spot = []
+        # for i in range(self.nPlayers):
+        #     for j in range(self.nClues):
+        #         if all_wants[i][j] == 0:
+        #             nValid += 1
+        #             valid_spot.append([i, j])
+        # self.nValid = nValid
+        # self.valid_spot = valid_spot
+        zero_count = np.count_nonzero(all_wants == 0)
+        zero_positions = np.where(all_wants == 0)
+        self.nValid = zero_count
+        self.valid_spot = list(zip(zero_positions[0], zero_positions[1]))
 
         # copy all_wants to temp_wants
-        temp_wants = []
-        for i in range(nPlayers):
-            temp_wants.append(all_wants[i].copy())
-        self.temp_wants = temp_wants
+        # temp_wants = []
+        # for i in range(nPlayers):
+        #     temp_wants.append(all_wants[i].copy())
+        # self.temp_wants = temp_wants
+        self.temp_wants = np.copy(all_wants)
 
         # 建立組合矩陣
         # conf[i][0] = 投票數
@@ -330,6 +335,10 @@ if __name__ == '__main__':
     print("===")
     print(all_stores)
     print(all_wants)
+
+    all_wants = np.array(all_wants)
+    print(all_wants)
+
 
     evaluator = ConditionEvaluator(all_wants)
     evaluator.evaluate()

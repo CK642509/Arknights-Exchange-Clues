@@ -154,7 +154,7 @@ class ConditionEvaluator:
             self.temp_wants[i][j] = -1
             yield from self.generate_conditions(index + 1)
     
-    def try_condition(self, condition: list, conf) -> list:
+    def try_condition(self, condition: np.ndarray, conf) -> list:
         """
         Evaluate the given condition. If it meets the criteria, return score and result, else return blank list.
         Criteria for a good condition:
@@ -163,6 +163,69 @@ class ConditionEvaluator:
         3. Minimize players exchanging 6 clues.
         4. Minimize exchange combinations between players.
         5. Minimize total exchanges.
+        """
+
+        """
+        condition shape = (nPlayers, nClues) = (8, 7)
+        condition example:
+        [[-1 -1  1  1  1  1  1]
+         [ 1  1  1  1  1  1  1]
+         [ 1  1  1  1  1  1  1]
+         [ 1 -1  1  1  1 -1  1]
+         [ 1  1  1  1  1 -1 -1]
+         [-1 -1 -1  1  1  1 -1]
+         [-1 -1 -1 -1  1  1  1]
+         [-1  1  1 -1 -1 -1 -1]]
+
+        number of 1 in each column =
+         [ 4, 4, 6, 6, 7, 5, 5]
+        表示各線索需要幾方交換
+
+        number of 1 in each row =
+        [
+            5,
+            7,
+            7,
+            5,
+            5,
+            3,
+            3,
+            2
+        ]
+        檢查各玩家需要交換幾個線索 (rank 1-3)
+
+        全部加總 (column or row) = 37 = 總交換次數 (rank 5)
+        """
+
+        # calculate number of 1 in each column
+        condition_col_sum = np.sum(condition == 1, axis=0)
+
+        # calculate number of 1 in each row
+        condition_row_sum = np.sum(condition == 1, axis=1)
+
+        # print("condition_col_sum ==>", condition_col_sum)
+        # print("condition_row_sum ==>", condition_row_sum)
+
+        # calculate total exchanges
+        total_exchange = np.sum(condition == 1)
+        # print("total_exchange ==>", total_exchange)
+
+        """
+        玩家交換矩陣 (每個線索都有)
+        exchange_matrix = [
+            [0, 0, 0, 0, 0, 0, 0, 0],   # 玩家1要給其他玩家的線索數
+            [0, 0, 0, 0, 0, 0, 0, 0],   # 玩家2
+            [0, 0, 0, 0, 0, 0, 0, 0],   # 玩家3
+            [0, 0, 0, 0, 0, 0, 0, 0],   # 玩家4
+            [0, 0, 0, 0, 0, 0, 0, 0],   # 玩家5
+            [0, 0, 0, 0, 0, 0, 0, 0],   # 玩家6
+            [0, 0, 0, 0, 0, 0, 0, 0],   # 玩家7
+            [0, 0, 0, 0, 0, 0, 0, 0]    # 玩家8
+        ]
+
+        若 玩家1 給 玩家2 線索1，則 exchange_matrix[0][1] += 1
+
+
         """
 
         tmp_how = []
